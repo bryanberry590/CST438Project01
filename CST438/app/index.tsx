@@ -1,6 +1,21 @@
+import { useEffect } from "react";
 import { Text, View } from "react-native";
+import { initDB } from "../db/schema";
 
 export default function Index() {
+  useEffect(() => {
+    const setup = async () => {
+      try {
+        await initDB();
+        console.log("Database initialized")
+      }
+      catch (err) {
+        console.error("Database initializing error", err)
+      }
+    };
+    setup();
+  }, []);
+  
   return (
     <View
       style={{
@@ -9,6 +24,7 @@ export default function Index() {
         alignItems: "center",
       }}
     >
+  
       <Text>This is a test page</Text>
     </View>
   );
