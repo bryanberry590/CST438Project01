@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { Text, View } from "react-native";
-import { initDB } from "../db/schema";
+import { db, initDB } from "../db/database";
 
 
 export default function Index() {
@@ -11,7 +11,11 @@ export default function Index() {
         console.log("Database initialized")
 
         //insert some test data in the table one time and then see if it persists through local storage
-        
+        await db.execAsync(
+          `INSERT INTO users (id, username, password) VALUES ("test", "test")`
+        );
+
+        const row = await db.getAllAsync(`SELECT * FROM users`);
       }
       catch (err) {
         console.error("Database initializing error", err)
