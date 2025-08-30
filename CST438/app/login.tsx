@@ -11,6 +11,7 @@ export default function LoginScreen() {
         onPress={() => {}}
       />
       <View style={styles.spacer} />
+      <Button
         title="Create Account"
         onPress={() => {}}
       />
