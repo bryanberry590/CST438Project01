@@ -1,15 +1,21 @@
-import { Text, View } from "react-native";
+import { useState } from 'react';
+import { View, Text, Button } from 'react-native';
 
-export default function Index() {
-  return (
-    <View
-      style={{
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-    >
-      <Text>This is a test page</Text>
-    </View>
-  );
-}
+// Add this inside your component
+const [apiMessage, setApiMessage] = useState('Not tested yet');
+
+const testAPI = async () => {
+  try {
+    const response = await fetch('http://localhost:3001/api/hello');
+    const data = await response.json();
+    setApiMessage(data.message);
+  } catch (error) {
+    setApiMessage('Error: ' + error.message);
+  }
+};
+
+// Add this to your JSX
+<View>
+  <Text>API Test: {apiMessage}</Text>
+  <Button title="Test API" onPress={testAPI} />
+</View>

@@ -4,7 +4,7 @@ import fetch from 'node-fetch';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
-const API_KEY = 'API_KEY'; // Replace with actual key
+const API_KEY = '8ddca86c020e23dcf80e644b511ecda7'; // Replace with actual key
 const BASE_URL = 'https://api.mediastack.com/v1/news';
 
 app.get('/api/news', async (req, res) => {
