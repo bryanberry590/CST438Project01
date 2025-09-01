@@ -1,15 +1,10 @@
 import { useEffect } from "react";
 import { Text, View } from "react-native";
 import { db, initDB } from "../db/database";
+import { User } from "../db/users";
+import { syncNews, getAllPosts, Post } from "../db/news";
 
-
-interface User {
-  id: number;
-  username: string;
-  password: String;
-}
-
-export default function Index() {
+function SetupDB() {
   useEffect(() => {
     const setup = async () => {
       try {
@@ -33,15 +28,30 @@ export default function Index() {
   
         }
         console.log("Database setup completed successfully");
-
       }
       catch (err) {
-        console.error("Database initializing error", err)
+        console.error("Database initializing error", err);
       }
 
     };
     setup();
   }, []);
+}
+
+const handleNewsSync = async () => {
+  try {
+    await syncNews('http://localhost:3001');
+
+    console.log('News synced successfully');
+  } catch(error) {
+    console.error('Failed to handle news sync', error);
+  }
+}
+
+export default function Index() {
+  SetupDB();
+
+  handleNewsSync();
   
   return (
     <View

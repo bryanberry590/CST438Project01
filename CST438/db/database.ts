@@ -14,14 +14,14 @@ export async function initDB() {
     );
 
     await db.execAsync(
-        `CREATE TABLE IF NOT EXISTS posts (
+        `CREATE TABLE IF NOT EXISTS news (
           id INTEGER PRIMARY KEY,
           author TEXT NOT NULL,
           title TEXT NOT NULL,
           description TEXT NOT NULL,
           url TEXT NOT NULL,
           source TEXT NOT NULL,
-          image TEXT NOT NULL,
+          image TEXT,
           category TEXT,
           language TEXT,
           country TEXT,
