@@ -5,7 +5,6 @@ export const db = SQLite.openDatabaseSync('NewsDatabase.db');
 export async function initDB() {    
     await db.execAsync('PRAGMA foreign_keys = ON');
 
-
     await db.execAsync(
       `CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY,
