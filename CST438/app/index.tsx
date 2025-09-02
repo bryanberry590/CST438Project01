@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { Text, View } from "react-native";
 import { db, initDB } from "../db/database";
 import { User } from "../db/users";
-import { syncNews, getAllPosts, Post } from "../db/news";
+import { useNewsSync, getAllPosts, Post } from "../db/news";
 
 function SetupDB() {
   useEffect(() => {
@@ -11,6 +11,7 @@ function SetupDB() {
         await initDB();
         console.log("Database initialized")
 
+        // ------ testing that local storage works ------
         const rows = await db.getAllAsync(`SELECT * FROM users`) as User[];
 
         if(rows.length == 0){
@@ -21,12 +22,12 @@ function SetupDB() {
         } else {
           console.log("table contains items");
           console.log(`User: id=${rows[0].id}, username=${rows[0].username}, password=${rows[0].password}`);
-
-          // for(const row of rows){
-          //   console.log(row.id, row.username, row.password)
-          // }
   
         }
+        //------ end testing for local storage ------
+
+        //call useNewsSync here which should run it every 5 minutes once the app is started
+        useNewsSync(5);
         console.log("Database setup completed successfully");
       }
       catch (err) {
@@ -38,20 +39,20 @@ function SetupDB() {
   }, []);
 }
 
-const handleNewsSync = async () => {
-  try {
-    await syncNews('http://localhost:3001');
+// const handleNewsSync = async () => {
+//   try {
+//     await syncNews('http://localhost:3001');
 
-    console.log('News synced successfully');
-  } catch(error) {
-    console.error('Failed to handle news sync', error);
-  }
-}
+//     console.log('News synced successfully');
+//   } catch(error) {
+//     console.error('Failed to handle news sync', error);
+//   }
+// }
 
 export default function Index() {
   SetupDB();
 
-  handleNewsSync();
+  //handleNewsSync();
   
   return (
     <View
