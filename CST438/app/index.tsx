@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { View, Text, Button } from 'react-native';
-
 // Add this inside your component
 const [apiMessage, setApiMessage] = useState('Not tested yet');
 
