@@ -38,9 +38,9 @@ async function updateNews() {
   try {
     const url = `${BASE_URL}?access_key=${API_KEY}&limit=10&countries=us`;
     const response = await fetch(url);
-    const { articles } = await response.json();
+    const { data } = await response.json();
 
-    for (const article of articles) {
+    for (const article of data) {
       await db.run(
         //IGNORE will check if the data is there and ignore adding it if necessary
         `INSERT OR IGNORE INTO news 

@@ -31,11 +31,13 @@ export interface NewsArticle {
   }
 
   const BACKEND_URL = "http://localhost:3001"; // change when deployed
+  //const BACKEND_URL = "http:192.168.0.13:8081";
 
   export async function syncNewsToLocalDB() {
     try {
       // fetch news from backend server
       const response = await fetch(`${BACKEND_URL}/api/news`);
+
       if (!response.ok) {
         throw new Error(`Failed to read from backend: ${response.status}`);
       }
@@ -72,7 +74,10 @@ export interface NewsArticle {
 
 export function useNewsSync(intervalMinutes: number = 5) {
   useEffect(() => {
+    console.log("called useNewsSync")
+
     // Run once immediately on mount
+    console.log("useNewsSync calling syncNewsToLocalDB in news.ts")
     syncNewsToLocalDB();
 
     // Set up interval to sync every intervalMinutes
@@ -80,7 +85,6 @@ export function useNewsSync(intervalMinutes: number = 5) {
       syncNewsToLocalDB();
     }, intervalMinutes * 60 * 1000); // convert minutes to milliseconds
 
-    // Clean up on unmount
     return () => clearInterval(interval);
   }, [intervalMinutes]);
 }

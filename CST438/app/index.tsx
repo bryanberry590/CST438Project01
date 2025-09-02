@@ -12,22 +12,20 @@ function SetupDB() {
         console.log("Database initialized")
 
         // ------ testing that local storage works ------
-        const rows = await db.getAllAsync(`SELECT * FROM users`) as User[];
+        // const rows = await db.getAllAsync(`SELECT * FROM users`) as User[];
 
-        if(rows.length == 0){
-          console.log("table is empty, adding items");
-          await db.execAsync(`INSERT INTO users (id, username, password) VALUES (NULL, 'testUsername', 'testPassword')`);
-          console.log("Test user inserted successfully");
+        // if(rows.length == 0){
+        //   console.log("table is empty, adding items");
+        //   await db.execAsync(`INSERT INTO users (id, username, password) VALUES (NULL, 'testUsername', 'testPassword')`);
+        //   console.log("Test user inserted successfully");
 
-        } else {
-          console.log("table contains items");
-          console.log(`User: id=${rows[0].id}, username=${rows[0].username}, password=${rows[0].password}`);
+        // } else {
+        //   console.log("table contains items");
+        //   console.log(`User: id=${rows[0].id}, username=${rows[0].username}, password=${rows[0].password}`);
   
-        }
+        // }
         //------ end testing for local storage ------
 
-        //call useNewsSync here which should run it every 5 minutes once the app is started
-        useNewsSync(5);
         console.log("Database setup completed successfully");
       }
       catch (err) {
@@ -52,6 +50,8 @@ function SetupDB() {
 export default function Index() {
   SetupDB();
 
+  //call useNewsSync here which should run it every 5 minutes once the app is started
+  useNewsSync(5);
   //handleNewsSync();
   
   return (
