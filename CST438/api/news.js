@@ -6,7 +6,7 @@ import sqlite3 from 'sqlite3';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
-const API_KEY = 'API_KEY'; // Replace with actual key
+const API_KEY = 'a3f1d612fd9cd7052f65bb7a97cad24b'; // Replace with actual key
 const BASE_URL = 'https://api.mediastack.com/v1/news';
 
 // Open SQLite DB on the server side (the front end db will pull from this)
@@ -77,6 +77,7 @@ app.get('/api/news', async (req, res) => {
     const rows = await db.all(`
       SELECT * FROM news ORDER BY publishTime DESC LIMIT 50
     `);
+
     res.json(rows);
   } catch (err) {
     res.status(500).json({ error: err.message });

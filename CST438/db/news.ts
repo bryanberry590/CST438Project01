@@ -30,8 +30,11 @@ export interface NewsArticle {
     publishTime: string;
   }
 
-  const BACKEND_URL = "http://localhost:3001"; // change when deployed
-  //const BACKEND_URL = "http:192.168.0.13:8081";
+  // const BACKEND_URL = "http://localhost:3001"; // change when deployed
+  // const BACKEND_URL = "http:192.168.0.13:8081";
+
+  //this backend url works for android emulator
+  const BACKEND_URL = "http://10.0.2.2:3001";
 
   export async function syncNewsToLocalDB() {
     try {
@@ -41,6 +44,7 @@ export interface NewsArticle {
       if (!response.ok) {
         throw new Error(`Failed to read from backend: ${response.status}`);
       }
+
       const posts: Post[] = await response.json();
   
       // Insert or update posts into local DB

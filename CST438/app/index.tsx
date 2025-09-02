@@ -1,8 +1,7 @@
 import { useEffect } from "react";
 import { Text, View } from "react-native";
-import { db, initDB } from "../db/database";
-import { User } from "../db/users";
-import { useNewsSync, getAllPosts, Post } from "../db/news";
+import { initDB } from "../db/database";
+import { useNewsSync } from "../db/news";
 
 function SetupDB() {
   useEffect(() => {
