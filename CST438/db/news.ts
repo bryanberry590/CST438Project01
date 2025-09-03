@@ -104,6 +104,16 @@ export function useNewsSync(intervalMinutes: number = 5) {
     }
   }
 
+  export async function getPostById(id: number) : Promise<Post[]>{
+    try {
+      const post = await db.getFirstAsync(`SELECT * FROM news WHERE id = ?`, [id] ) as Post[];
+      return post;
+    } catch (error) {
+      console.error('Error getting post by ID', error);
+      throw error;
+    }
+  }
+
 
   //function for getPostsByCategory, getPostBySource, getPostById, searchPosts, deletePost, syncNews (calls fetchNewsFromApi; stores in array of NewsArticle, calls insertPost on each NewsArticle fetched)
 
