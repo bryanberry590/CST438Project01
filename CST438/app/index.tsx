@@ -1,4 +1,4 @@
-import { useRouter } from "expo-router";
+import { router } from "expo-router";
 import { useEffect } from "react";
 import { Button, Text, View } from "react-native";
 import { initDB } from "../db/database";
