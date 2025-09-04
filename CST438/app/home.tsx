@@ -15,17 +15,11 @@ export default function HomeScreen() {
         <TouchableOpacity style={styles.navButton} onPress={() => handleNavPress('Home')}>
           <Text style={styles.navText}>Home</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.navButton} onPress={() => handleNavPress('Friends')}>
-          <Text style={styles.navText}>Friends</Text>
-        </TouchableOpacity>
         <TouchableOpacity style={styles.navButton} onPress={() => handleNavPress('Account')}>
           <Text style={styles.navText}>Account</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.navButton} onPress={() => handleNavPress('Settings')}>
           <Text style={styles.navText}>Settings</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.navButton} onPress={() => handleNavPress('Help')}>
-          <Text style={styles.navText}>Help</Text>
         </TouchableOpacity>
       </View>
       
