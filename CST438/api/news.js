@@ -12,7 +12,7 @@ const BASE_URL = 'https://api.mediastack.com/v1/news';
 // Open SQLite DB on the server side (the front end db will pull from this)
 // This will move all api calls to the backend
 const db = await open({
-  filename: './NewsDatabase.db',   // backend DB file
+  filename: './NewsDatabase.db',
   driver: sqlite3.Database
 });
 
@@ -33,7 +33,7 @@ await db.exec(`
   )
 `);
 
-// Function: sync with mediastack
+//sync with api
 async function updateNews() {
   try {
     const url = `${BASE_URL}?access_key=${API_KEY}&limit=10&countries=us`;
@@ -61,7 +61,7 @@ async function updateNews() {
       );
     }
 
-    console.log('News synced with DB');
+    console.log('News synced in backend database');
   } catch (error) {
     console.error('Error syncing news:', error);
   }
