@@ -22,6 +22,7 @@ function SetupDB() {
 
 export default function Index() {
   SetupDB();
+  const router = useRouter();
   //call useNewsSync here which should run it every 5 minutes once the app is started
   useNewsSync(5);
 
