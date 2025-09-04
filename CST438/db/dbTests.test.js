@@ -106,6 +106,10 @@ describe('Database Tests', () => {
             expect(mockGetFirstAsync).toHaveBeenCalledWith('SELECT * FROM news WHERE id = ?', [1]);
         });
     });
-
+  });
+  describe('Users Table Tests', () => {
+    describe('' () => {
+      
+    });
   });
 });
