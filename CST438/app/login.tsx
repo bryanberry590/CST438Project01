@@ -1,7 +1,10 @@
 import React from 'react';
-import { View, Text, Button, StyleSheet } from 'react-native';
+import { Button, StyleSheet, Text, View } from 'react-native';
+import { useRouter } from "expo-router";
 
 export default function LoginScreen() {
+
+  const router = useRouter();
 
   return (
     <View style={styles.container}>
@@ -13,7 +16,7 @@ export default function LoginScreen() {
       <View style={styles.spacer} />
       <Button
         title="Create Account"
-        onPress={() => {}}
+        onPress={() => router.push('/create_account')}
       />
       <View style={styles.spacer} />
       <Button
