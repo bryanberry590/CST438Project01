@@ -1,6 +1,7 @@
-import React, { useEffect } from "react";
-import { Button, StyleSheet, Text, View } from "react-native";
 import { useRouter } from "expo-router";
+import React, { useEffect } from "react";
+import { Button, StyleSheet, Text, View, Alert } from "react-native";
+import { useAuthRequest } from 'expo-auth-session/providers/google';
 import { initDB } from "../db/database";
 import { useNewsSync } from "../db/news";
 
@@ -18,9 +19,27 @@ function SetupDB() {
   }, []);
 }
 
-export default function LoginScreen() {
+export default function Index() {
   SetupDB();
   const router = useRouter();
+  // Google OAuth setup (moved from LoginScreen)
+  const [request, response, promptAsync] = useAuthRequest({
+    clientId: '1088273572419-sjk6i3rujq82ncr3c7r1rrhrvbbqbfqk.apps.googleusercontent.com',
+    // Temporary hardcoded Expo redirect for development
+    redirectUri: 'https://auth.expo.io/@aleguzmancs9/CST438',
+    scopes: ['openid', 'profile', 'email'],
+  });
+
+  useEffect(() => {
+    if (response?.type === 'success') {
+      // On successful sign-in, navigate or refresh the index as needed
+      console.log('Google auth successful', response);
+      router.replace('/');
+    }
+    else if (response?.type === 'error') {
+      Alert.alert('Login error', JSON.stringify(response));
+    }
+  }, [response]);
 
   // Call useNewsSync here which should run it every 5 minutes once the app is started
   useNewsSync(5);
@@ -31,7 +50,8 @@ export default function LoginScreen() {
   };
 
   const handleLoginWithGoogle = () => {
-    console.log("Login with Google pressed"); // actual Google logic needed
+    // Trigger the expo-auth-session Google prompt
+    promptAsync();
   };
 
   const handleContinueAsGuest = () => {
