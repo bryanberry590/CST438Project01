@@ -1,9 +1,15 @@
 import React, { useState } from 'react';
+import { router } from 'expo-router';
 import { Button, StyleSheet, Text, TextInput, View } from 'react-native';
+
 
 export default function CreateAccountScreen() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+
+  const handleCreateAccount = () => {
+    router.push('/home');
+  };
 
   return (
     <View style={styles.container}>
@@ -24,7 +30,12 @@ export default function CreateAccountScreen() {
       />
       <Button
         title="Create Account"
-        onPress={() => {}}
+        onPress={handleCreateAccount}
+      />
+      <View style={styles.spacer} />
+      <Button
+        title="Back to Login"
+        onPress={() => router.back()}
       />
     </View>
   );
@@ -35,7 +46,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    // backgroundColor: '#fff', change later
     padding: 24,
   },
   title: {

@@ -17,6 +17,7 @@
     "@react-navigation/bottom-tabs": "^7.3.10",
     "@react-navigation/elements": "^2.3.8",
     "@react-navigation/native": "^7.1.6",
+    "cors": "^2.8.5",
     "expo": "~53.0.22",
     "expo-auth-session": "~6.2.1",
     "expo-blur": "~14.1.5",
@@ -50,27 +51,25 @@
     "wa-sqlite": "^1.0.0"
   },
   "jest": {
-  "preset": "jest-expo",
-  "transformIgnorePatterns": [
-    "node_modules/(?!((jest-)?react-native|@react-native(-community)?)|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|@sentry/react-native|native-base|react-native-svg|expo-sqlite|sqlite|sqlite3)"
-  ],
-  "collectCoverage": true,
-  "collectCoverageFrom": [
-    "**/*.{ts,tsx,js,jsx}",
-    "!**/coverage/**",
-    "!**/node_modules/**",
-    "!**/babel.config.js",
-    "!**/expo-env.d.ts",
-    "!**/.expo/**"
-  ],
-  "moduleNameMapper": {
-    "^expo-sqlite$": "<rootDir>/jest-expo-sqlite-mock.js"
+    "preset": "jest-expo",
+    "transformIgnorePatterns": [
+      "node_modules/(?!((jest-)?react-native|@react-native(-community)?)|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|@sentry/react-native|native-base|react-native-svg|expo-sqlite|sqlite|sqlite3)"
+    ],
+    "collectCoverage": true,
+    "collectCoverageFrom": [
+      "**/*.{ts,tsx,js,jsx}",
+      "!**/coverage/**",
+      "!**/node_modules/**",
+      "!**/babel.config.js",
+      "!**/expo-env.d.ts",
+      "!**/.expo/**"
+    ],
+    "moduleNameMapper": {
+      "^expo-sqlite$": "<rootDir>/jest-expo-sqlite-mock.js"
+    },
+    "setupFiles": ["<rootDir>/jest.mock.setup.js"],
+    "setupFilesAfterEnv": ["<rootDir>/jest.setup.js"]
   },
-  "setupFiles": ["<rootDir>/jest.mock.setup.js"],
-  "setupFilesAfterEnv": [
-    "<rootDir>/jest.setup.js"
-  ]
-},
   "devDependencies": {
     "@babel/core": "^7.25.2",
     "@testing-library/jest-native": "^5.4.3",

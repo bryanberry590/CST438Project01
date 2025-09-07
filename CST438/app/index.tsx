@@ -1,6 +1,7 @@
 import { useRouter } from "expo-router";
-import { useEffect } from "react";
-import { Button, Text, View } from "react-native";
+import React, { useEffect } from "react";
+import { Button, StyleSheet, Text, View, Alert } from "react-native";
+import { useAuthRequest } from 'expo-auth-session/providers/google';
 import { initDB } from "../db/database";
 import { useNewsSync } from "../db/news";
 
@@ -9,12 +10,10 @@ function SetupDB() {
     const setup = async () => {
       try {
         await initDB();
-        console.log('Frontend database initialized')
-      }
-      catch (err) {
+        console.log("Frontend database initialized");
+      } catch (err) {
         console.error("Database initializing error", err);
       }
-
     };
     setup();
   }, []);
@@ -23,41 +22,70 @@ function SetupDB() {
 export default function Index() {
   SetupDB();
   const router = useRouter();
-  //call useNewsSync here which should run it every 5 minutes once the app is started
+  // Google OAuth setup (moved from LoginScreen)
+  const [request, response, promptAsync] = useAuthRequest({
+    clientId: '1088273572419-sjk6i3rujq82ncr3c7r1rrhrvbbqbfqk.apps.googleusercontent.com',
+    // Temporary hardcoded Expo redirect for development
+    redirectUri: 'https://auth.expo.io/@aleguzmancs9/CST438',
+    scopes: ['openid', 'profile', 'email'],
+  });
+
+  useEffect(() => {
+    if (response?.type === 'success') {
+      // On successful sign-in, navigate or refresh the index as needed
+      console.log('Google auth successful', response);
+      router.replace('/');
+    }
+    else if (response?.type === 'error') {
+      Alert.alert('Login error', JSON.stringify(response));
+    }
+  }, [response]);
+
+  // Call useNewsSync here which should run it every 5 minutes once the app is started
   useNewsSync(5);
 
-  //handleNewsSync();
+  const handleCreateAccount = () => {
+    router.push("/create_account");
+    // navigates user to home for now
+  };
+
+  const handleLoginWithGoogle = () => {
+    // Trigger the expo-auth-session Google prompt
+    promptAsync();
+  };
+
+  const handleContinueAsGuest = () => {
+    router.push("./home");
+  };
 
   return (
-    <View style={{ flex: 1 }}>
-      {/* Top Nav Bar */}
-      <View style={{
-        width: '100%',
-        height: 80,
-        paddingTop: 32, // For status bar
-        backgroundColor: '#1976d2', // More visible blue
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'flex-end',
-        paddingHorizontal: 16,
-        borderBottomWidth: 2,
-        borderBottomColor: '#1565c0',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.2,
-        shadowRadius: 2,
-        elevation: 3,
-      }}>
-        <Button title="Login" color="black" onPress={() => router.push('/login')} />
-      </View>
-      {/* Main Content */}
-      <View style={{
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-      }}>
-        <Text>This is a test page</Text>
-      </View>
+    <View style={styles.container}>
+      <Text style={styles.title}>Welcome!</Text>
+
+      <Button title="Login with Google" onPress={handleLoginWithGoogle} />
+      <View style={styles.spacer} />
+
+      <Button title="Create Account" onPress={handleCreateAccount} />
+      <View style={styles.spacer} />
+
+      <Button title="Continue as Guest" onPress={handleContinueAsGuest} />
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 24,
+  },
+  title: {
+    fontSize: 32,
+    fontWeight: "bold",
+    marginBottom: 32,
+  },
+  spacer: {
+    height: 16,
+  },
+});
