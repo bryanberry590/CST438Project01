@@ -18,4 +18,10 @@ describe('Index screen', () => {
     fireEvent.press(getByText('Login'));
     expect(mockPush).toHaveBeenCalledWith('/login');
   });
+
+  it('renders correctly', () => {
+    const { getByText } = render(<Index />);
+    expect(getByText('Login')).toBeTruthy();
+  });
+  
 });
