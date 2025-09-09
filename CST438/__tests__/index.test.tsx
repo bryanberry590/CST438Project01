@@ -13,9 +13,9 @@ describe('Index screen', () => {
     mockPush.mockClear();
   });
 
-  it('navigates to /login when Login button is pressed', () => {
+  it('navigates to /create_account when Create Account is pressed', () => {
     const { getByText } = render(<Index />);
-    fireEvent.press(getByText('Login'));
-    expect(mockPush).toHaveBeenCalledWith('/login');
+    fireEvent.press(getByText('Create Account'));
+    expect(mockPush).toHaveBeenCalledWith('/create_account');
   });
 });
