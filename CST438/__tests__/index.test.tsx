@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, fireEvent } from '@testing-library/react-native';
+import { render, fireEvent, act } from '@testing-library/react-native';
 
 const mockPush = jest.fn();
 jest.mock('expo-router', () => ({
@@ -13,9 +13,11 @@ describe('Index screen', () => {
     mockPush.mockClear();
   });
 
-  it('navigates to /create_account when Create Account is pressed', () => {
+  it('navigates to /create_account when Create Account is pressed', async () => {
     const { getByText } = render(<Index />);
-    fireEvent.press(getByText('Create Account'));
+    await act(async () => {
+      fireEvent.press(getByText('Create Account'));
+    });
     expect(mockPush).toHaveBeenCalledWith('/create_account');
   });
 });

@@ -79,7 +79,7 @@
       "!**/expo-env.d.ts",
       "!**/.expo/**"
     ],
-    "moduleNameMapping": {
+    "moduleNameMapper": {
       "^expo-sqlite$": "<rootDir>/jest-expo-sqlite-mock.js"
     },
     "setupFiles": ["<rootDir>/jest.mock.setup.js"],
