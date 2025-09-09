@@ -4,6 +4,16 @@
 
 import { db, initDB } from './database';
 import { getAllPosts, getPostById, insertPost } from './news';
+import {
+  changePassword,
+  changeUsername,
+  createUser,
+  deleteUserById,
+  getAllUsers,
+  getUserById,
+  getUserByUsername,
+  userExists
+} from './users';
 
 
 // Mock expo-sqlite
@@ -33,6 +43,11 @@ describe('Database Tests', () => {
     language: 'test',
     country: 'test',
     published_at: '2025-01-01T00:00:00Z'
+  }
+  let mockUser = {
+    id: 1,
+    username: 'testUsername',
+    password: 'testPassword'
   }
 
   beforeEach(() => {
@@ -106,6 +121,132 @@ describe('Database Tests', () => {
             expect(mockGetFirstAsync).toHaveBeenCalledWith('SELECT * FROM news WHERE id = ?', [1]);
         });
     });
+  });
 
+  describe('Users Table Tests', () => {
+
+    describe('CreateUser', () => {
+      it('should create a user with the given username and password', async () => {
+        mockGetFirstAsync.mockResolvedValueOnce(null);
+
+        mockRunAsync.mockResolvedValueOnce({ changes: 1 });
+
+        await createUser('newUser', 'newPassword');
+
+        expect(mockGetFirstAsync).toHaveBeenCalledWith(
+          'SELECT id FROM users WHERE username = ?',
+          ['newUser']
+        );
+
+        expect(mockRunAsync).toHaveBeenCalledWith(
+          expect.stringContaining('INSERT INTO users'),
+          ['newUser', 'newPassword']
+        );
+      });
+    });
+
+    describe('UserExists', () => {
+      it('should return true if user exists', async () => {
+        mockGetFirstAsync.mockResolvedValueOnce({ id: 1 });
+        const result = await userExists('existingUser');
+        expect(result).toBe(true);
+      });
+    
+      it('should return false if user does not exist', async () => {
+        mockGetFirstAsync.mockResolvedValueOnce(null);
+        const result = await userExists('nonExistingUser');
+        expect(result).toBe(false);
+      });
+    });
+
+    describe('GetUserById', () => {
+      it('should return a user by the specified id', async () => {
+        mockGetFirstAsync.mockResolvedValueOnce(mockUser);
+
+        const result = await getUserById(1);
+
+        expect(result).toEqual(mockUser);
+        expect(mockGetFirstAsync).toHaveBeenCalledWith(
+          'SELECT * FROM users WHERE id = ?',
+          [1]
+        );
+      });
+    });
+
+    describe('GetUserByUsername', () => {
+      it('should retrieve the user by username', async () => {
+        mockGetFirstAsync.mockResolvedValueOnce(mockUser);
+
+        const result = await getUserByUsername('testUsername');
+
+        expect(result).toEqual(mockUser);
+        expect(mockGetFirstAsync).toHaveBeenCalledWith(
+          'SELECT * FROM users WHERE username = ?',
+          ['testUsername']
+        );
+      });
+    });
+
+    describe('ChangePassword', () => {
+      it('should change the password for the specified ID', async () => {
+        mockRunAsync.mockResolvedValueOnce({ changes: 1 });
+
+        await changePassword(1, 'newPassword');
+
+        expect(mockRunAsync).toHaveBeenCalledWith(
+          'UPDATE users SET password = ? WHERE id = ?',
+          ['newPassword', 1]
+        );
+      });
+    });
+
+    describe('ChangeUsername', () => {
+      it('should change the username for the specified id', async () => {
+        mockGetFirstAsync.mockResolvedValueOnce(null);
+
+        mockRunAsync.mockResolvedValueOnce({ changes: 1 });
+
+        await changeUsername('newUsername', 1);
+
+        expect(mockGetFirstAsync).toHaveBeenCalledWith(
+          'SELECT id FROM users WHERE username = ?',
+          ['newUsername']
+        );
+
+        expect(mockRunAsync).toHaveBeenCalledWith(
+          'UPDATE users SET username = ? WHERE id = ?',
+          ['newUsername', 1]
+        );
+      });
+    });
+
+    describe('GetAllUsers', () => {
+      it('should retrieve all users in the table', async () => {
+        const mockUsers = [
+          { id: 1, username: 'user1', password: 'pass1' },
+          { id: 2, username: 'user2', password: 'pass2' },
+          { id: 3, username: 'user3', password: 'pass3' }
+        ];
+        mockGetAllAsync.mockResolvedValueOnce(mockUsers);
+
+        const result = await getAllUsers();
+
+        expect(result).toEqual(mockUsers);
+        expect(mockGetAllAsync).toHaveBeenCalledWith('SELECT * FROM users');
+      });
+    });
+
+    describe('DeleteUserById', () => {
+      it('should delete the user with the specified id', async () => {
+        mockRunAsync.mockResolvedValueOnce({ changes: 1 });
+
+        await deleteUserById(1);
+
+        expect(mockRunAsync).toHaveBeenCalledWith(
+          'DELETE FROM users WHERE id = ?',
+          [1]
+        );
+      });
+    });
   });
 });
