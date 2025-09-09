@@ -1,6 +1,8 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import { router } from 'expo-router';
+
 
 export default function HomeScreen() {
   const handleNavPress = (section: string) => {
@@ -18,7 +20,7 @@ export default function HomeScreen() {
         <TouchableOpacity style={styles.navButton} onPress={() => handleNavPress('Friends')}>
           <Text style={styles.navText}>Friends</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.navButton} onPress={() => handleNavPress('Account')}>
+        <TouchableOpacity style={styles.navButton} onPress={() => router.push('/account')}>
           <Text style={styles.navText}>Account</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.navButton} onPress={() => handleNavPress('Settings')}>
