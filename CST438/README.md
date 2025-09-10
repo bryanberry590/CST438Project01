@@ -1,50 +1,20 @@
-# Welcome to your Expo app 👋
+CST438 Project 01
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+News App -
 
-## Get started
+This app uses an API called 'mediastack' which is updated in real-time from news sources around the world. We are using this API to create a scrolling app where users can login/create an account and then view news of all kinds and stay updated on what is going on in the world.
 
-1. Install dependencies
+This is a React Native project that uses expo. We are building the app by running a backend server that communicates with the frontend code to stay up to date with the API. The frontend database will communicate with the screens of the app to display the correct information to the user.
 
-   ```bash
-   npm install
-   ```
 
-2. Start the app
+For running the app:
 
-   ```bash
-   npx expo start
-   ```
+1. 'npm install' to install all dependencies and packages
 
-In the output, you'll find options to open the app in a
+2. If there are errors installing, run 'rm -rf node_modules package-lock.json' then 'npm install'
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+This will delete the package-lock and do a fresh install of all packages from the package.json
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+3. Run the emulator, then run 'npm run dev' to run both the backend and frontend through one command
 
-## Get a fresh project
-
-When you're ready, run:
-
-```bash
-npm run reset-project
-```
-
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
-
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+To see other run commands check the package.json under 'scripts'
