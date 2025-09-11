@@ -6,29 +6,11 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Show root directory files
-        run: |
-          pwd
-          ls -la
-          cat package.json || echo "No package.json in root"
-
-      - name: Show CST438 directory files
-        run: |
-          ls -la CST438
-          cat CST438/package.json || echo "No package.json in CST438"
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: '20'
-
-      - name: Install dependencies
-        run: npm install
+      - run: npm install
         working-directory: CST438
-
-      - name: Run tests
-        run: npm test
+      - run: npm test
         working-directory: CST438
