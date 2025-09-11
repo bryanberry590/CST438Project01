@@ -21,6 +21,8 @@ function SetupDB() {
 
 export default function Index() {
   SetupDB();
+  //syncs news with backend database every 5 minutes
+  useNewsSync(5);
   const router = useRouter();
   // Google OAuth setup (moved from LoginScreen)
   const [request, response, promptAsync] = useAuthRequest({
@@ -42,7 +44,7 @@ export default function Index() {
   }, [response]);
 
   // Call useNewsSync here which should run it every 5 minutes once the app is started
-  useNewsSync(5);
+  // useNewsSync(5);
 
   const handleCreateAccount = () => {
     router.push("/create_account");

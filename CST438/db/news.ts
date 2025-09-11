@@ -95,6 +95,7 @@ export function useNewsSync(intervalMinutes: number = 5) {
   export async function getAllPosts() : Promise<Post[]>{
     try{
         const posts = await db.getAllAsync(`SELECT * FROM news ORDER BY publishTime DESC`) as Post[];
+
         return posts;
     } catch(error) {
         console.error('Error getting all posts', error);
@@ -102,9 +103,10 @@ export function useNewsSync(intervalMinutes: number = 5) {
     }
   }
 
-  export async function getPostById(id: number) : Promise<Post[]>{
+  export async function getPostById(id: number) : Promise<Post | null>{
     try {
-      const post = await db.getFirstAsync(`SELECT * FROM news WHERE id = ?`, [id] ) as Post[];
+      const post = await db.getFirstAsync(`SELECT * FROM news WHERE id = ?`, [id] ) as Post;
+
       return post;
     } catch (error) {
       console.error('Error getting post by ID', error);
