@@ -21,3 +21,10 @@ describe('Index screen', () => {
     expect(mockPush).toHaveBeenCalledWith('/create_account');
   });
 });
+
+// Basic Jest test to ensure workflow runs
+describe('Sample Test', () => {
+  it('should pass', () => {
+    expect(true).toBe(true);
+  });
+});
