@@ -1,29 +1,20 @@
-import React, { useState, useEffect } from 'react';
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
-  TouchableOpacity, 
-  FlatList, 
-  ActivityIndicator,
-  RefreshControl,
-  Image 
-} from 'react-native';
-import { StatusBar } from 'expo-status-bar';
 import { router } from 'expo-router';
+import { StatusBar } from 'expo-status-bar';
+import React, { useEffect, useState } from 'react';
+import {
+  ActivityIndicator,
+  FlatList,
+  Image,
+  RefreshControl,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
+} from 'react-native';
+import { Post, getAllPosts } from '../db/news';
+import Navbar from '../components/navbar';
 
-interface Post {
-  id: number | string;
-  title?: string;
-  description?: string;
-  url?: string;
-  source?: string;
-  image?: string;
-  category?: string;
-  language?: string;
-  country?: string;
-  published_at?: string;
-}
+
 
 export default function HomeScreen() {
   const [posts, setPosts] = useState<Post[]>([]);
@@ -31,45 +22,16 @@ export default function HomeScreen() {
   const [refreshing, setRefreshing] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
-  const API_KEY = '';
-  const API_BASE_URL = 'http://api.mediastack.com/v1';
-
   const fetchPosts = async (): Promise<void> => {
     try {
       setError(null);
+
+      const articles: Post[] = await getAllPosts();
       
-      const requestUrl = `${API_BASE_URL}/news?access_key=${API_KEY}&limit=5&languages=en`;
-      
-      console.log('Making API request to:', requestUrl);
-      console.log('API Key (first 8 chars):', API_KEY.substring(0, 8) + '...');
-      
-      const response = await fetch(requestUrl, {
-        method: 'GET',
-      });
-      
-      console.log('Response status:', response.status);
-      
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('Response error body:', errorText);
-        throw new Error(`Failed to fetch posts: ${response.status} ${response.statusText}`);
-      }
-      
-      const data = await response.json();
-      console.log('Response data:', data);
-      
-      const articles = data.data || [];
       console.log('Number of articles received:', articles.length);
       
-      const limitedPosts: Post[] = articles.slice(0, 5).map((article: any, index: number) => ({
-        id: article.url || index,
-        title: article.title,
-        description: article.description,
-        image: article.image,
-        source: article.source,
-        url: article.url,
-        published_at: article.published_at
-      }));
+      //limited to 5 posts for now
+      const limitedPosts: Post[] = articles.slice(0, 5);
       
       setPosts(limitedPosts);
       
@@ -92,14 +54,14 @@ export default function HomeScreen() {
     fetchPosts();
   };
 
-  const handleNavPress = (section: string): void => {
-    console.log(`${section} pressed`);
-    if (section === 'Logout') {
-      router.push('/');
-    }
-  };
+  // const handleNavPress = (section: string): void => {
+  //   console.log(`${section} pressed`);
+  //   if (section === 'Logout') {
+  //     router.push('/');
+  //   }
+  // };
 
-  const handlePostPress = (postId: number | string): void => {
+  const handlePostPress = (postId: number): void => {
     console.log(`Post ${postId} pressed`);
   };
 
@@ -119,11 +81,18 @@ export default function HomeScreen() {
         <Text style={styles.postTitle} numberOfLines={2}>
           {item.title || 'Untitled Article'}
         </Text>
-        {item.source && (
-          <Text style={styles.postSource}>
-            {item.source}
-          </Text>
-        )}
+        <View style={styles.postFooter}>
+          {item.source && (
+            <Text style={styles.postSource}>
+              {item.source}
+            </Text>
+          )}
+          {item.publishTime && (
+            <Text style={styles.postDate}>
+              {new Date(item.publishTime).toLocaleDateString()}
+            </Text>
+          )}
+        </View>
       </View>
     </TouchableOpacity>
   );
@@ -157,21 +126,8 @@ export default function HomeScreen() {
     <View style={styles.container}>
       <StatusBar style="auto" />
       <View style={styles.statusBarSpacer} />
-      
-      <View style={styles.navbar}>
-        <TouchableOpacity style={styles.navButton} onPress={() => handleNavPress('Home')}>
-          <Text style={styles.navText}>Home</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.navButton} onPress={() => router.push('/account')}>
-          <Text style={styles.navText}>Account</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.navButton} onPress={() => handleNavPress('Settings')}>
-          <Text style={styles.navText}>Settings</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.navButton} onPress={() => router.push('/')}>
-          <Text style={styles.navText}>Logout</Text>
-        </TouchableOpacity>
-      </View>
+
+      <Navbar activeTab="home" />
 
       {__DEV__ && (
         <View style={styles.debugContainer}>
@@ -306,25 +262,25 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '500',
   },
-  navbar: {
-    flexDirection: 'row',
-    backgroundColor: 'lightgray',
-    paddingVertical: 10,
-    paddingHorizontal: 5,
-    borderBottomWidth: 1,
-    borderBottomColor: 'darkgray',
-  },
-  navButton: {
-    flex: 1,
-    paddingVertical: 8,
-    paddingHorizontal: 4,
-    alignItems: 'center',
-  },
-  navText: {
-    fontSize: 12,
-    color: 'darkgray',
-    fontWeight: '500',
-  },
+  // navbar: {
+  //   flexDirection: 'row',
+  //   backgroundColor: 'lightgray',
+  //   paddingVertical: 10,
+  //   paddingHorizontal: 5,
+  //   borderBottomWidth: 1,
+  //   borderBottomColor: 'darkgray',
+  // },
+  // navButton: {
+  //   flex: 1,
+  //   paddingVertical: 8,
+  //   paddingHorizontal: 4,
+  //   alignItems: 'center',
+  // },
+  // navText: {
+  //   fontSize: 12,
+  //   color: 'darkgray',
+  //   fontWeight: '500',
+  // },
   debugContainer: {
     backgroundColor: 'lightyellow',
     padding: 8,
