@@ -5,15 +5,23 @@
     "strict": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
+    "allowJs": true,
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
     "paths": {
       "@/*": [
         "./*"
       ]
     }
   },
+  "ts-node": {
+    "esm": true,
+    "experimentalSpecifierResolution": "node"
+  },
   "include": [
     "**/*.ts",
     "**/*.tsx",
+    "**/*.js",
     ".expo/types/**/*.ts",
     "expo-env.d.ts"
   ]

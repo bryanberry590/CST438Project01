@@ -1,3 +1,13 @@
+export async function login(username: string, password: string): Promise<boolean> {
+  try {
+    const user = await db.getFirstAsync(`SELECT * FROM users WHERE username = ?`, [username]) as User | null;
+    if (!user) return false;
+    return user.password === password;
+  } catch (error) {
+    console.error('Error logging in:', error);
+    throw error;
+  }
+}
 import { db } from './database';
 
 export interface User {
