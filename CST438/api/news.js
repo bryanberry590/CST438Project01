@@ -1,4 +1,6 @@
 // Express backend endpoint for mediastack API
+import bodyParser from 'body-parser';
+import cors from 'cors';
 import express from 'express';
 import fetch from 'node-fetch';
 import { open } from 'sqlite';
@@ -8,6 +10,9 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 const API_KEY = 'API_KEY'; // Replace with actual key
 const BASE_URL = 'https://api.mediastack.com/v1/news';
+
+app.use(cors());
+app.use(bodyParser.json());
 
 // Open SQLite DB on the server side (the front end db will pull from this)
 // This will move all api calls to the backend
@@ -87,7 +92,6 @@ app.get('/api/news', async (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
-
 
 // app.get('/api/news', async (req, res) => {
 //   try {
