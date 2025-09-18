@@ -27,49 +27,64 @@ export default function AccountScreen() {
     }
 
     return (
-      <View style={styles.container}>
-          <StatusBar style="auto" />
-          <View style={styles.statusBarSpacer} />
-          
-          <Navbar activeTab="account" />
-
-          <View style={styles.content}>
-              <Text style={styles.title}>Account Page</Text>
-
-              <Text>Change Username</Text>
-              <TextInput
-                  value={username}
-                  onChangeText={setUsername}
-                  placeholder="New username"
-                  style={styles.input}
-              />
-              <Button title="Save Username" onPress={handleChangeUsername} />
-
-              <View style={styles.spacer} />
-
-              <Text>Change Password</Text>
-              <TextInput
-                  value={password}
-                  onChangeText={setPassword}
-                  placeholder="New password"
-                  secureTextEntry
-                  style={styles.input}
-              />
-              <TextInput
-                  value={confirmPassword}
-                  onChangeText={setConfirmPassword}
-                  placeholder="Confirm new password"
-                  secureTextEntry
-                  style={styles.input}
-              />
-              <Button title="Update Password" onPress={handleChangePassword} />
-
-              <View style={styles.spacer} />
-
-              <Button title="Delete Account" color="red" onPress={handleAccountDeletion} />
-          </View>
-      </View>
-  )};
+        <View style={[styles.container, { backgroundColor: '#121212' }]}>
+            <StatusBar style="light" />
+            <View style={[styles.statusBarSpacer, { backgroundColor: '#333333' }]} />
+            
+            <Navbar activeTab="account" />
+  
+            <View style={styles.content}>
+                <Text style={[styles.title, { color: '#FFFFFF' }]}>Account Page</Text>
+  
+                <Text style={{ color: '#FFFFFF' }}>Change Username</Text>
+                <TextInput
+                    value={username}
+                    onChangeText={setUsername}
+                    placeholder="New username"
+                    placeholderTextColor="#B0B0B0"
+                    style={[styles.input, { 
+                        backgroundColor: '#1F1F1F', 
+                        borderColor: '#333333',
+                        color: '#FFFFFF' 
+                    }]}
+                />
+                <Button title="Save Username" onPress={handleChangeUsername} />
+  
+                <View style={styles.spacer} />
+  
+                <Text style={{ color: '#FFFFFF' }}>Change Password</Text>
+                <TextInput
+                    value={password}
+                    onChangeText={setPassword}
+                    placeholder="New password"
+                    placeholderTextColor="#B0B0B0"
+                    secureTextEntry
+                    style={[styles.input, { 
+                        backgroundColor: '#1F1F1F', 
+                        borderColor: '#333333',
+                        color: '#FFFFFF' 
+                    }]}
+                />
+                <TextInput
+                    value={confirmPassword}
+                    onChangeText={setConfirmPassword}
+                    placeholder="Confirm new password"
+                    placeholderTextColor="#B0B0B0"
+                    secureTextEntry
+                    style={[styles.input, { 
+                        backgroundColor: '#1F1F1F', 
+                        borderColor: '#333333',
+                        color: '#FFFFFF' 
+                    }]}
+                />
+                <Button title="Update Password" onPress={handleChangePassword} />
+  
+                <View style={styles.spacer} />
+  
+                <Button title="Delete Account" color="red" onPress={handleAccountDeletion} />
+            </View>
+        </View>
+    )};
 
 const styles = StyleSheet.create({
   container: {

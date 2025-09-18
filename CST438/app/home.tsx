@@ -13,10 +13,12 @@ import {
 } from 'react-native';
 import { Post, getAllPosts } from '../db/news';
 import Navbar from '../components/navbar';
+import { useTheme } from './theme';
 
 
 
 export default function HomeScreen() {
+  const { theme } = useTheme();
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [refreshing, setRefreshing] = useState<boolean>(false);
@@ -67,7 +69,7 @@ export default function HomeScreen() {
 
   const renderPost = ({ item }: { item: Post }) => (
     <TouchableOpacity 
-      style={styles.postBlock}
+      style={[styles.postBlock, { backgroundColor: theme.card }]}
       onPress={() => handlePostPress(item.id)}
     >
       <Image 
@@ -78,17 +80,17 @@ export default function HomeScreen() {
         resizeMode="cover"
       />
       <View style={styles.postContent}>
-        <Text style={styles.postTitle} numberOfLines={2}>
+        <Text style={[styles.postTitle, { color: theme.text }]} numberOfLines={2}>
           {item.title || 'Untitled Article'}
         </Text>
         <View style={styles.postFooter}>
           {item.source && (
-            <Text style={styles.postSource}>
+            <Text style={[styles.postSource, { color: theme.textSecondary }]}>
               {item.source}
             </Text>
           )}
           {item.publishTime && (
-            <Text style={styles.postDate}>
+            <Text style={[styles.postDate, { color: theme.accent }]}>
               {new Date(item.publishTime).toLocaleDateString()}
             </Text>
           )}
@@ -99,15 +101,15 @@ export default function HomeScreen() {
 
   const renderLoading = () => (
     <View style={styles.centerContainer}>
-      <ActivityIndicator size="large" color="blue" />
-      <Text style={styles.loadingText}>Loading posts...</Text>
+      <ActivityIndicator size="large" color={theme.primary} />
+      <Text style={[styles.loadingText, { color: theme.textSecondary }]}>Loading posts...</Text>
     </View>
   );
 
   const renderError = () => (
     <View style={styles.centerContainer}>
-      <Text style={styles.errorText}>Error: {error}</Text>
-      <TouchableOpacity style={styles.retryButton} onPress={fetchPosts}>
+      <Text style={[styles.errorText, { color: theme.error }]}>Error: {error}</Text>
+      <TouchableOpacity style={[styles.retryButton, { backgroundColor: theme.primary }]} onPress={fetchPosts}>
         <Text style={styles.retryButtonText}>Retry</Text>
       </TouchableOpacity>
     </View>
@@ -115,23 +117,39 @@ export default function HomeScreen() {
 
   const renderEmpty = () => (
     <View style={styles.centerContainer}>
-      <Text style={styles.emptyText}>No posts available</Text>
-      <TouchableOpacity style={styles.retryButton} onPress={fetchPosts}>
+      <Text style={[styles.emptyText, { color: theme.textSecondary }]}>No posts available</Text>
+      <TouchableOpacity style={[styles.retryButton, { backgroundColor: theme.primary }]} onPress={fetchPosts}>
         <Text style={styles.retryButtonText}>Refresh</Text>
       </TouchableOpacity>
     </View>
   );
 
+  const dynamicStyles = StyleSheet.create ({
+    container: {
+      ...styles.container,
+      backgroundColor: theme.background,
+    },
+    statusBarSpacer: {
+      ...styles.statusBarSpacer,
+      backgroundColor: theme.border,
+    },
+    debugContainer: {
+      ...styles.debugContainer,
+      backgroundColor: theme.surface,
+      borderBottomColor: theme.border,
+    },
+  });
+
   return (
-    <View style={styles.container}>
-      <StatusBar style="auto" />
-      <View style={styles.statusBarSpacer} />
+    <View style={dynamicStyles.container}>
+      <StatusBar style="light" />
+      <View style={dynamicStyles.statusBarSpacer} />
 
       <Navbar activeTab="home" />
 
       {__DEV__ && (
-        <View style={styles.debugContainer}>
-          <TouchableOpacity style={styles.debugButton} onPress={fetchPosts}>
+        <View style={dynamicStyles.debugContainer}>
+          <TouchableOpacity style={[styles.debugButton, { backgroundColor: theme.primary }]} onPress={fetchPosts}>
             <Text style={styles.debugButtonText}>🔄 Test API Call</Text>
           </TouchableOpacity>
         </View>
@@ -152,7 +170,7 @@ export default function HomeScreen() {
           ]}
           showsVerticalScrollIndicator={false}
           refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={theme.primary}/>
           }
           ListEmptyComponent={renderEmpty}
           removeClippedSubviews={true}

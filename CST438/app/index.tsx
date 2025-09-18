@@ -4,6 +4,7 @@ import { Button, StyleSheet, Text, View, Alert } from "react-native";
 // import { useAuthRequest } from 'expo-auth-session/providers/google';
 import { initDB } from "../db/database";
 import { useNewsSync } from "../db/news";
+// import { useTheme } from "./theme";
 
 function SetupDB() {
   useEffect(() => {
@@ -44,7 +45,7 @@ export default function Index() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Welcome!</Text>
+      <Text style={[styles.title, { color: '#FFFFFF' }]}>Welcome!</Text>
 
   <Button title="Login" onPress={handleLogin} />
       <View style={styles.spacer} />
