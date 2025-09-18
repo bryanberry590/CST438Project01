@@ -1,7 +1,9 @@
 
-import React, { useState } from 'react';
 import { router } from 'expo-router';
+import React, { useState } from 'react';
 import { Button, StyleSheet, Text, TextInput, View } from 'react-native';
+import { createUser, userExists } from '../db/users';
+
 
 export default function CreateAccountScreen() {
   const [username, setUsername] = useState('');
@@ -17,21 +19,21 @@ export default function CreateAccountScreen() {
     }
     setLoading(true);
     try {
-      const response = await fetch('http://10.0.2.2:3001/api/users', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password })
-      });
-      const data = await response.json();
-      if (response.status === 201) {
-        setMessage('Account created successfully!');
-        setTimeout(() => {
-          router.push('/home');
-        }, 1000);
-      } else {
-        setMessage(data.message || 'Error creating account.');
-        console.log('API error:', data);
+      const exists = await userExists(username);
+
+      if (exists) {
+        setMessage('Username already exists. Please try a different username.');
+        setLoading(false);
+        return;
       }
+
+      await createUser(username, password);
+      setMessage('Account created successfully!');
+      
+      setTimeout(() => {
+        router.push('/home');
+      }, 1000);
+
     } catch (error) {
       let errorMsg = 'Unknown error';
       if (error instanceof Error) {
@@ -45,8 +47,8 @@ export default function CreateAccountScreen() {
           errorMsg = String(error);
         }
       }
-      setMessage('Network error: ' + errorMsg);
-      console.log('Network error:', error);
+      setMessage('Error Creating User ' + errorMsg);
+      console.log('Error Creating User:', error);
     }
     setLoading(false);
   };
