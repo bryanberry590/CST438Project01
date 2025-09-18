@@ -1,66 +1,21 @@
-import React, { useState, useEffect } from 'react';
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
-  TouchableOpacity, 
-  FlatList, 
-  ActivityIndicator,
-  RefreshControl,
-  Image,
-  ScrollView 
-} from 'react-native';
-import { StatusBar } from 'expo-status-bar';
 import { router } from 'expo-router';
+import { StatusBar } from 'expo-status-bar';
+import React, { useEffect, useState } from 'react';
+import {
+  ActivityIndicator,
+  FlatList,
+  Image,
+  RefreshControl,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
+} from 'react-native';
 import { Post, getAllPosts } from '../db/news';
 import Navbar from '../components/navbar';
 import { useTheme } from './theme';
 
-//Post object 
-interface Post {
-  id: number | string;
-  title?: string;
-  description?: string;
-  url?: string;
-  source?: string;
-  image?: string;
-  category?: string;
-  language?: string;
-  country?: string;
-  published_at?: string;
-}
 
-
-// Filter options
-const CATEGORIES = [
-  { label: 'All', value: '' },
-  { label: 'General', value: 'general' },
-  { label: 'Business', value: 'business' },
-  { label: 'Entertainment', value: 'entertainment' },
-  { label: 'Health', value: 'health' },
-  { label: 'Science', value: 'science' },
-  { label: 'Sports', value: 'sports' },
-  { label: 'Technology', value: 'technology' }
-];
-
-const COUNTRIES = [
-  { label: 'All', value: '' },
-  { label: 'US', value: 'us' },
-  { label: 'UK', value: 'gb' },
-  { label: 'Canada', value: 'ca' },
-  { label: 'Australia', value: 'au' },
-  { label: 'Germany', value: 'de' },
-  { label: 'France', value: 'fr' }
-];
-
-const SOURCES = [
-  { label: 'All', value: '' },
-  { label: 'CNN', value: 'cnn' },
-  { label: 'BBC', value: 'bbc' },
-  { label: 'Reuters', value: 'reuters' },
-  { label: 'AP News', value: 'associated press' },
-  { label: 'The Guardian', value: 'theguardian' }
-];
 
 export default function HomeScreen() {
   const { theme } = useTheme();
@@ -69,65 +24,16 @@ export default function HomeScreen() {
   const [refreshing, setRefreshing] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
-  const [selectedCategory, setSelectedCategory] = useState<string>('');
-  const [selectedCountry, setSelectedCountry] = useState<string>('');
-  const [selectedSource, setSelectedSource] = useState<string>('');
-  const [showFilters, setShowFilters] = useState<boolean>(false);
-
-  //API configuration
-  const API_KEY = 'a3f1d612fd9cd7052f65bb7a97cad24b';
-  const API_BASE_URL = 'http://api.mediastack.com/v1';
-
   const fetchPosts = async (): Promise<void> => {
     try {
       setError(null);
-  
-      const params = new URLSearchParams({
-        access_key: API_KEY,
-        limit: '15',
-        languages: 'en'
-      });
-  
-      if (selectedCategory) {
-        params.append('categories', selectedCategory);
-      }
-      if (selectedCountry) {
-        params.append('countries', selectedCountry);
-      }
-      if (selectedSource) {
-        params.append('sources', selectedSource);
-      }
+
+      const articles: Post[] = await getAllPosts();
       
-      const requestUrl = `${API_BASE_URL}/news?${params.toString()}`;
+      console.log('Number of articles received:', articles.length);
       
-      const response = await fetch(requestUrl, {
-        method: 'GET',
-      });
-            
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('Response error body:', errorText);
-        throw new Error(`Failed to fetch posts: ${response.status} ${response.statusText}`);
-      }
-      
-      const data = await response.json();
-      console.log('Response data:', data);
-      
-      const articles = data.data || [];
-      console.log('articles received:', articles.length);
-      
-      // limit to 15 posts 
-      const limitedPosts: Post[] = articles.slice(0, 15).map((article: any, index: number) => ({
-        id: article.url || index,
-        title: article.title,
-        description: article.description,
-        image: article.image,
-        source: article.source,
-        url: article.url,
-        category: article.category,
-        country: article.country,
-        published_at: article.published_at
-      }));
+      //limited to 5 posts for now
+      const limitedPosts: Post[] = articles.slice(0, 5);
       
       setPosts(limitedPosts);
       
@@ -143,89 +49,22 @@ export default function HomeScreen() {
 
   useEffect(() => {
     fetchPosts();
-  }, [selectedCategory, selectedCountry, selectedSource]);
+  }, []);
 
   const onRefresh = (): void => {
     setRefreshing(true);
     fetchPosts();
   };
 
-  const handleNavPress = (section: string): void => {
-    console.log(`${section} pressed`);
-    if (section === 'Logout') {
-      router.push('/');
-    }
-  };
+  // const handleNavPress = (section: string): void => {
+  //   console.log(`${section} pressed`);
+  //   if (section === 'Logout') {
+  //     router.push('/');
+  //   }
+  // };
 
-  const handlePostPress = (postId: number | string): void => {
+  const handlePostPress = (postId: number): void => {
     console.log(`Post ${postId} pressed`);
-  };
-
-  const clearAllFilters = (): void => {
-    setSelectedCategory('');
-    setSelectedCountry('');
-    setSelectedSource('');
-  };
-  
-  const renderFilterButton = (
-    items: Array<{label: string, value: string}>,
-    selectedValue: string,
-    onSelect: (value: string) => void,
-    title: string
-  ) => (
-    <View style={styles.filterGroup}>
-      <Text style={styles.filterGroupTitle}>{title}</Text>
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filterScroll}>
-        {items.map((item) => (
-          <TouchableOpacity
-            key={item.value}
-            style={[
-              styles.filterChip,
-              selectedValue === item.value && styles.filterChipSelected
-            ]}
-            onPress={() => onSelect(item.value)}
-          >
-            <Text style={[
-              styles.filterChipText,
-              selectedValue === item.value && styles.filterChipTextSelected
-            ]}>
-              {item.label}
-            </Text>
-          </TouchableOpacity>
-        ))}
-      </ScrollView>
-    </View>
-  );
-  
-  const renderFilters = () => (
-    <View style={styles.filtersContainer}>
-      <View style={styles.filtersHeader}>
-        <Text style={styles.filtersTitle}>Filters</Text>
-        <View style={styles.filtersActions}>
-          <TouchableOpacity style={styles.clearButton} onPress={clearAllFilters}>
-            <Text style={styles.clearButtonText}>Clear All</Text>
-          </TouchableOpacity>
-          <TouchableOpacity 
-            style={styles.closeButton} 
-            onPress={() => setShowFilters(false)}
-          >
-            <Text style={styles.closeButtonText}>✕</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-      
-      {renderFilterButton(CATEGORIES, selectedCategory, setSelectedCategory, 'Category')}
-      {renderFilterButton(COUNTRIES, selectedCountry, setSelectedCountry, 'Country')}
-      {renderFilterButton(SOURCES, selectedSource, setSelectedSource, 'Source')}
-    </View>
-  );
-  
-  const getActiveFiltersCount = (): number => {
-    let count = 0;
-    if (selectedCategory) count++;
-    if (selectedCountry) count++;
-    if (selectedSource) count++;
-    return count;
   };
 
   const renderPost = ({ item }: { item: Post }) => (
@@ -250,9 +89,6 @@ export default function HomeScreen() {
               {item.source}
             </Text>
           )}
-          {item.category && (
-            <Text style={styles.postCategory}>
-              {item.category.toUpperCase()}
           {item.publishTime && (
             <Text style={[styles.postDate, { color: theme.accent }]}>
               {new Date(item.publishTime).toLocaleDateString()}
@@ -262,6 +98,7 @@ export default function HomeScreen() {
       </View>
     </TouchableOpacity>
   );
+
   const renderLoading = () => (
     <View style={styles.centerContainer}>
       <ActivityIndicator size="large" color={theme.primary} />
@@ -304,39 +141,16 @@ export default function HomeScreen() {
   });
 
   return (
-<!--     <View style={styles.container}>
-      <StatusBar style="auto" />
-      <View style={styles.statusBarSpacer} /> -->
-      
-      <View style={styles.navbar}>
-        <TouchableOpacity style={styles.navButton} onPress={() => handleNavPress('Home')}>
-          <Text style={styles.navText}>Home</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.navButton} onPress={() => router.push('/account')}>
-          <Text style={styles.navText}>Account</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.navButton} onPress={() => router.push('/')}>
-          <Text style={styles.navText}>Logout</Text>
-        </TouchableOpacity>
-      </View>
     <View style={dynamicStyles.container}>
       <StatusBar style="light" />
       <View style={dynamicStyles.statusBarSpacer} />
 
-      <View style={styles.filterToggleContainer}>
-        <TouchableOpacity style={styles.filterToggleButton}onPress={() => setShowFilters(!showFilters)}>
-          <Text style={styles.filterToggleText}>
-          Filters {getActiveFiltersCount() > 0 && `(${getActiveFiltersCount()})`}
-          </Text>
-        </TouchableOpacity>
-      </View>
-{showFilters && renderFilters()}
+      <Navbar activeTab="home" />
 
       {__DEV__ && (
         <View style={dynamicStyles.debugContainer}>
           <TouchableOpacity style={[styles.debugButton, { backgroundColor: theme.primary }]} onPress={fetchPosts}>
-            <Text style={styles.debugButtonText}> Test API Call</Text>
-
+            <Text style={styles.debugButtonText}>🔄 Test API Call</Text>
           </TouchableOpacity>
         </View>
       )}
@@ -370,7 +184,6 @@ export default function HomeScreen() {
   );
 }
 
-// colors, sizes, spacing, and layout for the home UI
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -467,25 +280,25 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '500',
   },
-  navbar: {
-    flexDirection: 'row',
-    backgroundColor: 'lightgray',
-    paddingVertical: 10,
-    paddingHorizontal: 5,
-    borderBottomWidth: 1,
-    borderBottomColor: 'darkgray',
-  },
-  navButton: {
-    flex: 1,
-    paddingVertical: 8,
-    paddingHorizontal: 4,
-    alignItems: 'center',
-  },
-  navText: {
-    fontSize: 12,
-    color: 'darkgray',
-    fontWeight: '500',
-  },
+  // navbar: {
+  //   flexDirection: 'row',
+  //   backgroundColor: 'lightgray',
+  //   paddingVertical: 10,
+  //   paddingHorizontal: 5,
+  //   borderBottomWidth: 1,
+  //   borderBottomColor: 'darkgray',
+  // },
+  // navButton: {
+  //   flex: 1,
+  //   paddingVertical: 8,
+  //   paddingHorizontal: 4,
+  //   alignItems: 'center',
+  // },
+  // navText: {
+  //   fontSize: 12,
+  //   color: 'darkgray',
+  //   fontWeight: '500',
+  // },
   debugContainer: {
     backgroundColor: 'lightyellow',
     padding: 8,
@@ -503,110 +316,5 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 14,
     fontWeight: '500',
-  },
-  // Filter Styling
-  filterToggleContainer: {
-    backgroundColor: '#f5f5f5',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
-  },
-  filterToggleButton: {
-    backgroundColor: 'blue',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 6,
-    alignSelf: 'flex-start',
-  },
-  filterToggleText: {
-    color: 'white',
-    fontSize: 14,
-    fontWeight: '500',
-  },
-  filtersContainer: {
-    backgroundColor: 'white',
-    borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
-    paddingBottom: 16,
-  },
-  filtersHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
-  },
-  filtersTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: 'black',
-  },
-  filtersActions: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  clearButton: {
-    backgroundColor: '#f0f0f0',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 4,
-    marginRight: 8,
-  },
-  clearButtonText: {
-    fontSize: 12,
-    color: 'gray',
-  },
-  closeButton: {
-    padding: 4,
-  },
-  closeButtonText: {
-    fontSize: 18,
-    color: 'gray',
-  },
-  filterGroup: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-  },
-  filterGroupTitle: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: 'black',
-    marginBottom: 8,
-  },
-  filterScroll: {
-    flexDirection: 'row',
-  },
-  filterChip: {
-    backgroundColor: '#f0f0f0',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 16,
-    marginRight: 8,
-    borderWidth: 1,
-    borderColor: '#e0e0e0',
-  },
-  filterChipSelected: {
-    backgroundColor: 'blue',
-    borderColor: 'blue',
-  },
-  filterChipText: {
-    fontSize: 12,
-    color: 'black',
-  },
-  filterChipTextSelected: {
-    color: 'white',
-    fontWeight: '500',
-  },
-  postCategory: {
-    fontSize: 10,
-    color: 'blue',
-    fontWeight: 'bold',
-    backgroundColor: '#e3f2fd',
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 4,
   },
 });
