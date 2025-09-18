@@ -1,13 +1,21 @@
 // Express backend endpoint for mediastack API
+import bodyParser from 'body-parser';
+import cors from 'cors';
 import express from 'express';
 import fetch from 'node-fetch';
 import { open } from 'sqlite';
 import sqlite3 from 'sqlite3';
+import { createUser } from '../db/users';
+
+
 
 const app = express();
 const PORT = process.env.PORT || 3001;
-const API_KEY = 'API_KEY'; // Replace with actual key
+const API_KEY = '9360f24bc1d84ad570eedcab8bbef189'; // Replace with actual key
 const BASE_URL = 'https://api.mediastack.com/v1/news';
+
+app.use(cors());
+app.use(bodyParser.json());
 
 // Open SQLite DB on the server side (the front end db will pull from this)
 // This will move all api calls to the backend
@@ -88,6 +96,22 @@ app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
 
+app.post('/api/users', async (req, res) => {
+    console.log('POST /api/users called with body:', req.body);
+    const { username, password } = req.body;
+    if (!username || !password) {
+      console.log('Missing username or password');
+      return res.status(400).json({ message: 'Username and password required.' });
+    }
+    try {
+      await createUser(username, password);
+      console.log('User created:', username);
+      res.status(201).json({ message: 'Account created successfully.' });
+    } catch (error) {
+      console.error('Error creating user:', error);
+      res.status(500).json({ message: 'Error creating account.' });
+    }
+  });
 
 // app.get('/api/news', async (req, res) => {
 //   try {

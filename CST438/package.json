@@ -4,21 +4,22 @@
   "main": "expo-router/entry",
   "version": "1.0.0",
   "scripts": {
-  "dev": "concurrently \"expo start --android\" \"node api/news.js\"",
-  "start": "expo start",
-  "reset-project": "node ./scripts/reset-project.js",
-  "android": "expo start --android",
-  "ios": "expo start --ios",
-  "web": "expo start --web",
-  "api": "node api/news.js",
-  "lint": "expo lint",
-  "test": "jest || echo \"No tests found\" && exit 0"
+    "dev": "concurrently \"expo start --android\" \"node api/news.js\"",
+    "start": "expo start",
+    "reset-project": "node ./scripts/reset-project.js",
+    "android": "expo start --android",
+    "ios": "expo start --ios",
+    "web": "expo start --web",
+    "api": "node api/news.js",
+    "lint": "expo lint",
+    "test": "jest || echo \"No tests found\" && exit 0"
   },
   "dependencies": {
     "@expo/vector-icons": "^14.1.0",
     "@react-navigation/bottom-tabs": "^7.3.10",
     "@react-navigation/elements": "^2.3.8",
     "@react-navigation/native": "^7.1.6",
+    "body-parser": "^2.2.0",
     "cors": "^2.8.5",
     "expo": "~53.0.22",
     "expo-auth-session": "~6.2.1",
@@ -82,8 +83,12 @@
     "moduleNameMapper": {
       "^expo-sqlite$": "<rootDir>/jest-expo-sqlite-mock.js"
     },
-    "setupFiles": ["<rootDir>/jest.mock.setup.js"],
-    "setupFilesAfterEnv": ["<rootDir>/jest.setup.js"]
+    "setupFiles": [
+      "<rootDir>/jest.mock.setup.js"
+    ],
+    "setupFilesAfterEnv": [
+      "<rootDir>/jest.setup.js"
+    ]
   },
   "private": true
 }
