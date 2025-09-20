@@ -1,18 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
-  TouchableOpacity, 
-  FlatList, 
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  FlatList,
   ActivityIndicator,
   RefreshControl,
   Image,
-  ScrollView 
+  ScrollView
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { router } from 'expo-router';
-import { Post, getAllPosts } from '../db/news';
+import { getAllPosts } from '../db/news';
 import Navbar from '../components/navbar';
 import { useTheme } from './theme';
 
@@ -28,6 +28,7 @@ interface Post {
   language?: string;
   country?: string;
   published_at?: string;
+  publishTime?: string;
 }
 
 
@@ -74,63 +75,52 @@ export default function HomeScreen() {
   const [selectedSource, setSelectedSource] = useState<string>('');
   const [showFilters, setShowFilters] = useState<boolean>(false);
 
-  //API configuration
-  const API_KEY = 'a3f1d612fd9cd7052f65bb7a97cad24b';
-  const API_BASE_URL = 'http://api.mediastack.com/v1';
-
+  // Use local database instead of direct API calls
   const fetchPosts = async (): Promise<void> => {
     try {
       setError(null);
-  
-      const params = new URLSearchParams({
-        access_key: API_KEY,
-        limit: '15',
-        languages: 'en'
-      });
-  
+
+      // Get posts from local database (which syncs with backend)
+      const localPosts = await getAllPosts();
+      console.log('Posts from local DB:', localPosts.length);
+
+      // Apply filters to local posts
+      let filteredPosts = localPosts;
+
       if (selectedCategory) {
-        params.append('categories', selectedCategory);
+        filteredPosts = filteredPosts.filter(post =>
+          post.category?.toLowerCase() === selectedCategory.toLowerCase()
+        );
       }
+
       if (selectedCountry) {
-        params.append('countries', selectedCountry);
+        filteredPosts = filteredPosts.filter(post =>
+          post.country?.toLowerCase() === selectedCountry.toLowerCase()
+        );
       }
+
       if (selectedSource) {
-        params.append('sources', selectedSource);
+        filteredPosts = filteredPosts.filter(post =>
+          post.source?.toLowerCase().includes(selectedSource.toLowerCase())
+        );
       }
-      
-      const requestUrl = `${API_BASE_URL}/news?${params.toString()}`;
-      
-      const response = await fetch(requestUrl, {
-        method: 'GET',
-      });
-            
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('Response error body:', errorText);
-        throw new Error(`Failed to fetch posts: ${response.status} ${response.statusText}`);
-      }
-      
-      const data = await response.json();
-      console.log('Response data:', data);
-      
-      const articles = data.data || [];
-      console.log('articles received:', articles.length);
-      
-      // limit to 15 posts 
-      const limitedPosts: Post[] = articles.slice(0, 15).map((article: any, index: number) => ({
-        id: article.url || index,
-        title: article.title,
-        description: article.description,
-        image: article.image,
-        source: article.source,
-        url: article.url,
-        category: article.category,
-        country: article.country,
-        published_at: article.published_at
+
+      // Convert to Post interface format and limit to 15
+      const limitedPosts: Post[] = filteredPosts.slice(0, 15).map((post, index) => ({
+        id: post.id,
+        title: post.title,
+        description: post.description,
+        image: post.image || undefined,
+        source: post.source,
+        url: post.url,
+        category: post.category || undefined,
+        country: post.country || undefined,
+        published_at: post.publishTime,
+        publishTime: post.publishTime
       }));
-      
+
       setPosts(limitedPosts);
-      
+
     } catch (err: unknown) {
       console.error('Fetch error:', err);
       const errorMessage = err instanceof Error ? err.message : 'An unknown error occurred';
@@ -166,9 +156,9 @@ export default function HomeScreen() {
     setSelectedCountry('');
     setSelectedSource('');
   };
-  
+
   const renderFilterButton = (
-    items: Array<{label: string, value: string}>,
+    items: Array<{ label: string, value: string }>,
     selectedValue: string,
     onSelect: (value: string) => void,
     title: string
@@ -196,7 +186,7 @@ export default function HomeScreen() {
       </ScrollView>
     </View>
   );
-  
+
   const renderFilters = () => (
     <View style={styles.filtersContainer}>
       <View style={styles.filtersHeader}>
@@ -205,21 +195,21 @@ export default function HomeScreen() {
           <TouchableOpacity style={styles.clearButton} onPress={clearAllFilters}>
             <Text style={styles.clearButtonText}>Clear All</Text>
           </TouchableOpacity>
-          <TouchableOpacity 
-            style={styles.closeButton} 
+          <TouchableOpacity
+            style={styles.closeButton}
             onPress={() => setShowFilters(false)}
           >
             <Text style={styles.closeButtonText}>✕</Text>
           </TouchableOpacity>
         </View>
       </View>
-      
+
       {renderFilterButton(CATEGORIES, selectedCategory, setSelectedCategory, 'Category')}
       {renderFilterButton(COUNTRIES, selectedCountry, setSelectedCountry, 'Country')}
       {renderFilterButton(SOURCES, selectedSource, setSelectedSource, 'Source')}
     </View>
   );
-  
+
   const getActiveFiltersCount = (): number => {
     let count = 0;
     if (selectedCategory) count++;
@@ -229,12 +219,12 @@ export default function HomeScreen() {
   };
 
   const renderPost = ({ item }: { item: Post }) => (
-    <TouchableOpacity 
+    <TouchableOpacity
       style={[styles.postBlock, { backgroundColor: theme.card }]}
       onPress={() => handlePostPress(item.id)}
     >
-      <Image 
-        source={{ 
+      <Image
+        source={{
           uri: item.image || 'https://via.placeholder.com/300x200?text=No+Image'
         }}
         style={styles.postImage}
@@ -253,6 +243,8 @@ export default function HomeScreen() {
           {item.category && (
             <Text style={styles.postCategory}>
               {item.category.toUpperCase()}
+            </Text>
+          )}
           {item.publishTime && (
             <Text style={[styles.postDate, { color: theme.accent }]}>
               {new Date(item.publishTime).toLocaleDateString()}
@@ -287,7 +279,7 @@ export default function HomeScreen() {
     </View>
   );
 
-  const dynamicStyles = StyleSheet.create ({
+  const dynamicStyles = StyleSheet.create({
     container: {
       ...styles.container,
       backgroundColor: theme.background,
@@ -304,10 +296,7 @@ export default function HomeScreen() {
   });
 
   return (
-<!--     <View style={styles.container}>
-      <StatusBar style="auto" />
-      <View style={styles.statusBarSpacer} /> -->
-      
+    <View style={dynamicStyles.container}>
       <View style={styles.navbar}>
         <TouchableOpacity style={styles.navButton} onPress={() => handleNavPress('Home')}>
           <Text style={styles.navText}>Home</Text>
@@ -319,18 +308,17 @@ export default function HomeScreen() {
           <Text style={styles.navText}>Logout</Text>
         </TouchableOpacity>
       </View>
-    <View style={dynamicStyles.container}>
       <StatusBar style="light" />
       <View style={dynamicStyles.statusBarSpacer} />
 
       <View style={styles.filterToggleContainer}>
-        <TouchableOpacity style={styles.filterToggleButton}onPress={() => setShowFilters(!showFilters)}>
+        <TouchableOpacity style={styles.filterToggleButton} onPress={() => setShowFilters(!showFilters)}>
           <Text style={styles.filterToggleText}>
-          Filters {getActiveFiltersCount() > 0 && `(${getActiveFiltersCount()})`}
+            Filters {getActiveFiltersCount() > 0 && `(${getActiveFiltersCount()})`}
           </Text>
         </TouchableOpacity>
       </View>
-{showFilters && renderFilters()}
+      {showFilters && renderFilters()}
 
       {__DEV__ && (
         <View style={dynamicStyles.debugContainer}>
@@ -356,7 +344,7 @@ export default function HomeScreen() {
           ]}
           showsVerticalScrollIndicator={false}
           refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={theme.primary}/>
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={theme.primary} />
           }
           ListEmptyComponent={renderEmpty}
           removeClippedSubviews={true}
@@ -377,7 +365,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
   },
   statusBarSpacer: {
-    height: 2, 
+    height: 2,
     backgroundColor: 'lightgray',
   },
   postsContainer: {
