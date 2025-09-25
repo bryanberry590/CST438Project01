@@ -3,12 +3,14 @@ import { router } from 'expo-router';
 import React, { useState } from 'react';
 import { Button, StyleSheet, Text, TextInput, View } from 'react-native';
 import { login } from '../db/users';
+import { useAuth } from '../contexts/AuthContext';
 
 export default function LoginScreen() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
+  const { login: loginUser } = useAuth();
 
   const handleLogin = async () => {
     setMessage('');
@@ -21,6 +23,8 @@ export default function LoginScreen() {
       const success = await login(username, password);
       if (success) {
         setMessage('Login successful!');
+        // Store the username in our auth context
+        loginUser(username);
         setTimeout(() => {
           router.push('/home');
         }, 1000);
