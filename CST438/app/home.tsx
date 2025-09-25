@@ -15,6 +15,7 @@ import { router } from 'expo-router';
 import { getAllPosts } from '../db/news';
 import Navbar from '../components/navbar';
 import { useTheme } from './theme';
+import { useAuth } from '../contexts/AuthContext';
 
 //Post object 
 interface Post {
@@ -65,6 +66,7 @@ const SOURCES = [
 
 export default function HomeScreen() {
   const { theme } = useTheme();
+  const { username, isGuest, isLoggedIn, logout } = useAuth();
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [refreshing, setRefreshing] = useState<boolean>(false);
@@ -304,12 +306,22 @@ export default function HomeScreen() {
         <TouchableOpacity style={styles.navButton} onPress={() => router.push('/account')}>
           <Text style={styles.navText}>Account</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.navButton} onPress={() => router.push('/')}>
+        <TouchableOpacity style={styles.navButton} onPress={() => {
+          logout();
+          router.push('/');
+        }}>
           <Text style={styles.navText}>Logout</Text>
         </TouchableOpacity>
       </View>
       <StatusBar style="light" />
       <View style={dynamicStyles.statusBarSpacer} />
+
+      {/* Welcome message showing authentication status */}
+      <View style={styles.welcomeContainer}>
+        <Text style={styles.welcomeText}>
+          {isLoggedIn ? `Welcome, ${username}!` : isGuest ? 'Welcome, Guest!' : 'Welcome!'}
+        </Text>
+      </View>
 
       <View style={styles.filterToggleContainer}>
         <TouchableOpacity style={styles.filterToggleButton} onPress={() => setShowFilters(!showFilters)}>
@@ -367,6 +379,16 @@ const styles = StyleSheet.create({
   statusBarSpacer: {
     height: 2,
     backgroundColor: 'lightgray',
+  },
+  welcomeContainer: {
+    padding: 16,
+    backgroundColor: '#333333',
+  },
+  welcomeText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#FFFFFF',
+    textAlign: 'center',
   },
   postsContainer: {
     padding: 16,

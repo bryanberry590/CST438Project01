@@ -4,6 +4,7 @@ import { Button, StyleSheet, Text, View, Alert } from "react-native";
 // import { useAuthRequest } from 'expo-auth-session/providers/google';
 import { initDB } from "../db/database";
 import { useNewsSync } from "../db/news";
+import { useAuth } from "../contexts/AuthContext";
 // import { useTheme } from "./theme";
 
 function SetupDB() {
@@ -25,6 +26,7 @@ export default function Index() {
   //syncs news with backend database every 5 minutes
   useNewsSync(5);
   const router = useRouter();
+  const { continueAsGuest } = useAuth();
 
   // Call useNewsSync here which should run it every 5 minutes once the app is started
   // useNewsSync(5);
@@ -34,12 +36,12 @@ export default function Index() {
     // navigates user to home for now
   };
 
-
   const handleLogin = () => {
     router.push('/login');
   };
 
   const handleContinueAsGuest = () => {
+    continueAsGuest();
     router.push("./home");
   };
 

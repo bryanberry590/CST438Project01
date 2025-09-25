@@ -2,6 +2,7 @@ import React from 'react';
 import { Stack } from "expo-router";
 import { StatusBar } from 'expo-status-bar';
 import { ThemeProvider, useTheme } from './theme';
+import { AuthProvider } from '../contexts/AuthContext';
 
 function RootLayoutNav() {
   const { theme } = useTheme();
@@ -23,8 +24,10 @@ function RootLayoutNav() {
 
 export default function RootLayout() {
   return (
-    <ThemeProvider>
-      <RootLayoutNav />
-    </ThemeProvider>
+    <AuthProvider>
+      <ThemeProvider>
+        <RootLayoutNav />
+      </ThemeProvider>
+    </AuthProvider>
   );
 }
