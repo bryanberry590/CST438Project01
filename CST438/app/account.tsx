@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, Alert } from 'react-native';
 import { router } from 'expo-router';
-import Navbar from '../components/navbar';
 import { StatusBar } from 'expo-status-bar';
+import React, { useEffect, useState } from 'react';
+import { Alert, Button, StyleSheet, Text, TextInput, View } from 'react-native';
+import Navbar from '../components/navbar';
 import { useAuth } from '../contexts/AuthContext';
-import { getUserByUsername, changeUsername, changePassword, deleteUserById } from '../db/users';
+import { changePassword, changeUsername, deleteUserById, getUserByUsername } from '../db/users';
 
 export default function AccountScreen() {
     const { username: authUsername, isGuest, isLoggedIn, logout } = useAuth();
@@ -44,27 +44,73 @@ export default function AccountScreen() {
         loadUserDetails();
     }, [authUsername, isGuest, isLoggedIn]);
 
+    const validateUsername = (username: string): boolean => {
+        if (!username || username.trim().length === 0) {
+            Alert.alert('Error', 'Username cannot be empty');
+            return false;
+        }
+        if (username.trim().length < 3) {
+            Alert.alert('Error', 'Username must be at least 3 characters long');
+            return false;
+        }
+        if (username === authUsername) {
+            Alert.alert('Error', 'New username must be different from current username');
+            return false;
+        }
+        return true;
+    };
+
+    const validatePassword = (pwd: string, confirmPwd: string): boolean => {
+        if (!pwd || pwd.length === 0) {
+            Alert.alert('Error', 'Password cannot be empty');
+            return false;
+        }
+        if (pwd.length < 6) {
+            Alert.alert('Error', 'Password must be at least 6 characters long');
+            return false;
+        }
+        if (pwd !== confirmPwd) {
+            Alert.alert('Error', 'Passwords do not match');
+            return false;
+        }
+        return true;
+    };
+
+
+
     const handleChangeUsername = async () => {
         if (!userDetails) return;
         
+        const trimmedUsername = newUsername.trim();
+        if (!validateUsername(trimmedUsername)) return;
+
         setLoading(true);
         try {
-            await changeUsername(newUsername, userDetails.id);
+            try {
+                const existingUser = await getUserByUsername(trimmedUsername);
+                if (existingUser && existingUser.id !== userDetails.id) {
+                    Alert.alert('Error', 'Username already exists. Please choose a different one.');
+                    setLoading(false);
+                    return;
+                }
+            } catch (error) {
+                //  username does not exist which we want
+            }
+
+            await changeUsername(trimmedUsername, userDetails.id);
             Alert.alert('Success', 'Username changed successfully!');
             // Note: In a real app, you'd update the auth context with the new username
         } catch (error: any) {
             Alert.alert('Error', error.message || 'Failed to change username');
+            setNewUsername(authUsername || '');
         }
         setLoading(false);
     };
 
     const handleChangePassword = async () => {
         if (!userDetails) return;
-        
-        if(password !== confirmPassword) {
-            Alert.alert('Error', 'Passwords do not match');
-            return;
-        }
+
+        if (!validatePassword(password, confirmPassword)) return;
         
         setLoading(true);
         try {
@@ -73,6 +119,7 @@ export default function AccountScreen() {
             setPassword('');
             setConfirmPassword('');
         } catch (error: any) {
+            console.error('Error changing password:', error);
             Alert.alert('Error', error.message || 'Failed to change password');
         }
         setLoading(false);
@@ -97,6 +144,7 @@ export default function AccountScreen() {
                             logout();
                             router.push('/');
                         } catch (error: any) {
+                            console.error('Error deleting account:', error);
                             Alert.alert('Error', error.message || 'Failed to delete account');
                         }
                         setLoading(false);
@@ -141,6 +189,7 @@ export default function AccountScreen() {
                         borderColor: '#333333',
                         color: '#FFFFFF' 
                     }]}
+                    editable={!loading}
                 />
                 <Button title="Save Username" onPress={handleChangeUsername} disabled={loading} />
   
@@ -158,6 +207,7 @@ export default function AccountScreen() {
                         borderColor: '#333333',
                         color: '#FFFFFF' 
                     }]}
+                    editable={!loading}
                 />
                 <TextInput
                     value={confirmPassword}
@@ -170,12 +220,20 @@ export default function AccountScreen() {
                         borderColor: '#333333',
                         color: '#FFFFFF' 
                     }]}
+                    editable={!loading}
                 />
                 <Button title="Update Password" onPress={handleChangePassword} disabled={loading} />
   
                 <View style={styles.spacer} />
   
-                <Button title="Delete Account" color="red" onPress={handleAccountDeletion} disabled={loading} />
+                <View style={styles.section}>
+                    <Button 
+                        title={loading ? "Processing..." : "Delete Account"} 
+                        color="red" 
+                        onPress={handleAccountDeletion} 
+                        disabled={loading} 
+                    />
+                </View>
             </View>
         </View>
     )};
@@ -206,6 +264,10 @@ const styles = StyleSheet.create({
   spacer: {
       height: 20,
   },
+  section: {
+    marginBottom: 15,
+  }
+
 });
 
 
