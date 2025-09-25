@@ -59,6 +59,7 @@ export default function CreateAccountScreen() {
       <TextInput
         style={styles.input}
         placeholder="Username"
+        placeholderTextColor="#B0B0B0"
         value={username}
         onChangeText={setUsername}
         autoCapitalize="none"
@@ -66,6 +67,7 @@ export default function CreateAccountScreen() {
       <TextInput
         style={styles.input}
         placeholder="Password"
+        placeholderTextColor="#B0B0B0"
         value={password}
         onChangeText={setPassword}
         secureTextEntry
@@ -75,8 +77,14 @@ export default function CreateAccountScreen() {
         onPress={handleCreateAccount}
         disabled={loading}
       />
-      {message ? <Text style={{ marginTop: 16, color: message.includes('success') ? 'green' : 'red' }}>{message}</Text> : null}
-      <View style={styles.spacer} />
+      {message ? (
+        <Text style={[
+          styles.message, 
+          { color: message.includes('success') ? '#4CAF50' : '#F44336' }
+        ]}>
+          {message}
+        </Text>
+      ) : null}      <View style={styles.spacer} />
       <Button
         title="Back to Login"
         onPress={() => router.back()}
@@ -92,21 +100,30 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: 24,
+    backgroundColor: '#121212',
   },
   title: {
     fontSize: 28,
     fontWeight: 'bold',
     marginBottom: 24,
+    color: '#FFFFFF',
   },
   input: {
     width: '80%',
     height: 40,
-    borderColor: '#ccc',
+    borderColor: '#333333',
     borderWidth: 1,
     borderRadius: 8,
     marginBottom: 16,
     paddingHorizontal: 10,
     fontSize: 16,
+    backgroundColor: '#1F1F1F',
+    color: '#FFFFFF',
+  },
+  message: {
+    marginTop: 16,
+    fontSize: 14,
+    textAlign: 'center',
   },
   spacer: {
     height: 16,
